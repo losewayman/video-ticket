@@ -1,5 +1,5 @@
 # video-ticket
-#### node初学，后台还存在的问题
+## node初学，后台还存在的问题
 * 路由问题
 * cookie/session
 * 返回页面模板
@@ -14,3 +14,10 @@
 #### 返回页面渲染模板
 >例：一个剧目的列表，点击进入之后每个页面的结构都是相同的
 * 对其具体实现不是很清楚，猜想此功能由后台模板渲染完成
+## 数据库的使用情况(mysql)
+> 共有5张表
+* login（用户表） | id | username | password | rooter |
+* video（剧目表）| id | name | type | time | actor | director | brief | img |
+* plan（演出计划表）| id | name | house | time | number | price | seat |
+* house（演出厅表）| id | housename | seat | number |
+* orders（订单表）| id | username | videoname | house | time | number | seat | ticket | price | money |
