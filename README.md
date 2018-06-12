@@ -21,3 +21,6 @@
 * plan（演出计划表）| id | name | house | time | number | price | seat |
 * house（演出厅表）| id | housename | seat | number |
 * orders（订单表）| id | username | videoname | house | time | number | seat | ticket | price | money |
+create table house (id int primary key auto_increment not null,housename varchar(50) not null,seatnum int not null,seat varchar(500) not null);
+create table plan (id int primary key auto_increment,name varchar(50) not null,house varchar(50) not null,time date not null,number int not null,price int not null,seat varchar(500) not null);
+ create table orders(id int primary key auto_increment,username varchar(30) not null,videoname varchar(30) not null,house varchar(30) not null,time data not null,number int not null,seat varchar(500) not null,ticket int not null,price int not null,money int not null);
