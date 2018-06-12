@@ -1,0 +1,243 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>添加剧目</title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+    <style>
+        * {
+            margin: 0px;
+        }
+        
+        #addvideo {
+            width: 800px;
+            margin: auto;
+            display: none;
+        }
+        
+        .add_col {
+            width: 500px;
+            height: 50px;
+            box-sizing: border-box;
+            padding: 7px 0px;
+        }
+        
+        .add_col p {
+            line-height: 36px;
+            width: 100px;
+            display: inline-block;
+            text-align: center;
+            background-color: #87CEFA;
+        }
+        
+        .add_col input {
+            position: relative;
+            top: 0px;
+            width: 360px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        
+        #button button {
+            width: 100px;
+            height: 36px;
+            border: 0px;
+            background-color: #40E0D0;
+            outline: none;
+            box-shadow: 2px 3px 3px #72777b;
+            position: relative;
+        }
+        
+        #button button:active {
+            background-color: #3CB371;
+            top: 2px;
+            left: 2px;
+            box-shadow: none;
+        }
+        
+        #table {
+            width: 100%;
+            margin: auto;
+        }
+        
+        #show {
+            width: 120px;
+            height: 36px;
+            outline: none;
+            border: 0px;
+            background-color: #40E0D0;
+            margin: 10px;
+            box-shadow: 2px 3px 3px #72777b;
+            position: relative;
+        }
+        
+        #show:active {
+            background-color: darkcyan;
+            top: 2px;
+            left: 2px;
+            box-shadow: none;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="show">添加用户</button>
+    <div id="addvideo">
+        <div class="add_col">
+            <p>账号</p><input type="text" name="username" id="username" autocomplete="off" placeholder="请输入6-12位账号" /></div>
+        <div class="add_col">
+            <p>密码</p><input type="text" name="password" id="password" autocomplete="off" placeholder="请输入6-12位密码" /></div>
+        <div class="add_col">
+            <p>权限</p><input type="text" name="rooter" id="rooter" autocomplete="off" placeholder="1:顾客    2:系统管理员    3:运营经理    4:财务经理" /></div>
+
+        <div class="add_col" id="button"><button id="go">提交</button></div>
+    </div>
+    <div id="table">
+        <table id="demo" lay-filter="test"></table>
+    </div>
+
+</body>
+<script src="../layui/layui.all.js"></script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<script>
+    var $ = layui.$;
+    var table = layui.table;
+    var layer = layui.layer;
+    var form = layui.form;
+    table.render({
+        elem: '#demo',
+        cellMinWidth: 100,
+
+        url: '/get/message?api=user', //数据接口
+        id: 'testReload',
+        cols: [
+            [ //表头
+                {
+                    type: 'numbers',
+                    align: 'center',
+                    width: '4%'
+                }, {
+                    field: 'username',
+                    title: '用户名',
+                    align: 'center',
+                    width: '12%',
+                }, {
+                    field: 'id',
+                    title: '编号',
+                    align: 'center',
+                    width: '12%',
+                    sort: true
+                }, {
+                    field: 'password',
+                    title: '密码',
+                    align: 'center',
+                    width: '12%',
+                }, {
+                    field: 'rooter',
+                    title: '权限',
+                    width: '50%'
+                }, {
+                    fixed: 'right',
+                    width: '8%',
+                    align: 'center',
+                    toolbar: '#barDemo'
+                }
+            ]
+        ]
+    });
+    table.on('tool(test)', function(obj) {
+        var data = obj.data;
+        var layevent = obj.event;
+        console.log(data, layevent);
+        if (layevent == "del") {
+            layer.confirm('确认删除吗', function(index) {
+                obj.del();
+                layer.close(index);
+                $.ajax({
+                    url: '/del/message?api=user',
+                    type: "POST",
+                    data: {
+                        id: data.id,
+                    },
+                    success: function(data) {
+                        var obj = JSON.parse(data);
+                        if (obj.status === "false") {
+                            alert(obj.msg);
+                        } else if (obj.status === "true") {
+                            alert("删除成功");
+                        }
+                    },
+                    error: function() {
+                        alert("请求删除失败");
+                    }
+                });
+            });
+        }
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        function back() {
+            $("#username").val("");
+            $("#password").val("");
+            $("#rooter").val("");
+        }
+
+        function check() {
+            var inpu = $("input");
+            var k = 0;
+            for (k; k < inpu.length; k++) {
+                if (inpu[k].value == null || inpu[k].value == "") {
+                    alert("不允许提交空值");
+                    return false;
+                }
+            }
+            if (isNaN($("#rooter").val()) || $("#rooter").val() < 0 || $("#rooter").val() > 4) {
+                alert("请输入权限1-4");
+                $("#rooter").val("");
+                return false;
+            }
+            return true;
+        }
+        $("#show").click(function() {
+            $("#addvideo").slideToggle("slow");
+        });
+        $("#go").click(function() {
+            if (check()) {
+                $.ajax({
+                    url: "/post/add", //接口
+                    type: "POST", //请求类型，有GET和POST
+                    //type:"POST",
+                    data: { //里面是要发送的数据
+                        api: "user",
+                        username: $("#username").val(),
+                        password: $("#password").val(),
+                        rooter: $("#rooter").val(),
+                    },
+                    success: function(data) { //请求成功后执行，data是成功后接收到的数据
+                        back();
+                        var obj = JSON.parse(data);
+                        if (obj.status === "false") {
+                            alert(data);
+                        } else if (obj.status === "true") {
+
+                        }
+                        console.log("post接收到的数据：" + data);
+                    },
+                    error: function() { //请求失败后执行
+                        console.log("post请求出错");
+                    }
+                });
+            }
+        });
+
+    });
+</script>
+
+</html>

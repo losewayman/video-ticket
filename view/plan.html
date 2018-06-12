@@ -1,0 +1,349 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>演出计划</title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <style>
+        * {
+            margin: 0px;
+        }
+        
+        #addplan {
+            width: 800px;
+            margin: auto;
+            display: none;
+        }
+        
+        .add_col {
+            width: 500px;
+            height: 50px;
+            box-sizing: border-box;
+            padding: 7px 0px;
+        }
+        
+        .add_col p {
+            line-height: 36px;
+            width: 100px;
+            display: inline-block;
+            text-align: center;
+            background-color: #87CEFA;
+        }
+        
+        .add_col input {
+            position: relative;
+            height: 36px;
+            width: 360px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        
+        .add_col select {
+            position: relative;
+            height: 36px;
+            width: 360px;
+            padding: 8px;
+            box-sizing: border-box;
+            top: 2.5px;
+        }
+        
+        #name,
+        #house {
+            left: -4px;
+        }
+        
+        #button button {
+            width: 100px;
+            height: 36px;
+            border: 0px;
+            background-color: #40E0D0;
+            outline: none;
+            box-shadow: 2px 3px 3px #72777b;
+            position: relative;
+        }
+        
+        #button button:active {
+            background-color: #3CB371;
+            top: 2px;
+            left: 2px;
+            box-shadow: none;
+        }
+        
+        #show {
+            width: 120px;
+            height: 36px;
+            outline: none;
+            border: 0px;
+            background-color: #40E0D0;
+            margin: 10px;
+            box-shadow: 2px 3px 3px #72777b;
+            position: relative;
+        }
+        
+        #show:active {
+            background-color: darkcyan;
+            top: 2px;
+            left: 2px;
+            box-shadow: none;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="show">添加演出计划</button>
+    <div id="addplan">
+        <div class="add_col">
+            <p>电影名</p>
+            <select name="name" id="name">
+                <option value="">请选择</option>
+                <option v-for="(video,index) in videos" v-bind:value="video.name" >{{video.name}}</option>
+            </select>
+        </div>
+        <div class="add_col">
+            <p>演出厅</p>
+            <select name="house" id="house">
+                    <option value="">请选择</option>
+                    <option v-for="(house,index) in houses" v-bind:value="house.housename" >{{house.housename}}</option>
+                </select>
+        </div>
+        <div class="add_col">
+            <p>日期</p><input type="date" name="time" id="time" autocomplete="off" placeholder="xxxx-xx-xx" /></div>
+        <div class="add_col">
+            <p>场次</p><select name="number" id="number">
+                <option value="">请选择</option>
+                <option value="1">1 (8：00-10：30)</option>
+                <option value="2">2 (11：00-13：30)</option>
+                <option value="3">3 (14：00-16：30)</option>
+                <option value="4">4 (17：00-19：30)</option>
+                <option value="5">5 (20：00-22：30)</option>
+                </select></div>
+
+        <div class="add_col">
+            <p>价格</p><input type="text" name="price" id="price" autocomplete="off" placeholder="（单位：元)例：38" /></div>
+        <div class="add_col" id="button"><button type="button" id="go">提交</button></div>
+    </div>
+    <div id="table">
+        <table id="demo" lay-filter="test"></table>
+    </div>
+    <script src="../layui/layui.all.js"></script>
+
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+    <script>
+        var $ = layui.$;
+        var table = layui.table;
+        var layer = layui.layer;
+        var laytpl = layui.laytpl;
+        var form = layui.form;
+        table.render({
+            elem: '#demo',
+            cellMinWidth: 100,
+
+            url: '/get/message?api=plan', //数据接口
+            id: 'testReload',
+            cols: [
+                [ //表头
+                    {
+                        type: 'numbers',
+                        align: 'center',
+                        width: '4%'
+                    }, {
+                        field: 'name',
+                        title: '剧目名',
+                        align: 'center',
+                        width: '18%',
+                        sort: true
+                    }, {
+                        field: 'house',
+                        title: '演出厅',
+                        align: 'center',
+                        width: '12%',
+                        sort: true
+                    }, {
+                        field: 'id',
+                        title: '编号',
+                        align: 'center',
+                        width: '8%',
+                        sort: true
+                    }, {
+                        field: 'time',
+                        title: '日期',
+                        align: 'center',
+                        templet: '#titleTpl',
+                        width: '16%',
+                        sort: true
+                    }, {
+                        field: 'number',
+                        title: '场次',
+                        align: 'center',
+                        width: '12%',
+                        sort: true
+
+                    }, {
+                        field: 'price',
+                        title: '价格',
+                        align: 'center',
+                        width: '21%',
+                        sort: true
+                    }, {
+                        fixed: 'right',
+                        align: 'center',
+                        width: '8%',
+                        toolbar: '#barDemo'
+                    }
+                ]
+            ]
+        });
+        table.on('tool(test)', function(obj) {
+            var data = obj.data;
+            var layevent = obj.event;
+            console.log(data, layevent);
+            if (layevent == "del") {
+                layer.confirm('确认删除吗', function(index) {
+                    obj.del();
+                    layer.close(index);
+                    $.ajax({
+                        url: '/del/message?api=plan',
+                        type: "POST",
+                        data: {
+                            id: data.id,
+                        },
+                        success: function(data) {
+                            var obj = JSON.parse(data);
+                            if (obj.status === "false") {
+                                alert(obj.msg);
+                            } else if (obj.status === "true") {
+                                alert("删除成功");
+                            }
+                        },
+                        error: function() {
+                            alert("请求删除失败");
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+    <script type="text/html" id="titleTpl">
+        {{time(d.time)}}
+    </script>
+    <script>
+        function time(time) {
+            var date = new Date(time);
+            var date_value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+            return date_value;
+        }
+
+        function check() {
+            var inpu = $("input");
+            var k = 0;
+            for (k; k < inpu.length; k++) {
+                if (inpu[k].value == null || inpu[k].value == "") {
+                    alert("不允许提交空值");
+                    return false;
+                }
+            }
+            console.log(isNaN($("price").val()));
+            if (isNaN($("#price").val())) {
+                alert("请输入正确格式的价格");
+                $("#price").val("");
+                return false;
+            }
+            if (isNaN($("#number").val()) || $("#number").val() < 0 || $("#number").val() > 5) {
+                alert("请输入正确的场次");
+                $("#number").val("");
+                return false;
+            }
+            return true;
+        }
+        $(document).ready(function() {
+            function back() {
+                $("#name").val("");
+                $("#house").val("");
+                $("#time").val("");
+                $("#number").val("");
+                $("#price").val("");
+            }
+            $("#show").click(function() {
+                $("#addplan").slideToggle("slow");
+            });
+
+            $.ajax({
+                url: "/get/message?api=house",
+                type: "GET",
+                data: {},
+                success: function(data) {
+                    var obj = JSON.parse(data);
+                    console.log(data);
+                    console.log(obj.data);
+                    var video = new Vue({
+                        el: '#house',
+                        data: {
+                            houses: obj.data,
+                        }
+                    })
+                },
+                error: function() {
+                    console.log("请求出错");
+                }
+            });
+            $.ajax({
+                url: "/get/message?api=video",
+                type: "GET",
+                data: {},
+                success: function(data) {
+                    var obj = JSON.parse(data);
+                    console.log(obj);
+                    console.log(data);
+                    var video = new Vue({
+                        el: '#name',
+                        data: {
+                            videos: obj.data,
+                        }
+                    });
+                },
+                error: function() {
+                    console.log("请求出错");
+                }
+            });
+            $("#go").click(function() {
+                if (check()) {
+                    $.ajax({
+                        url: "/and/add", //接口
+                        type: "POST", //请求类型，有GET和POST
+                        //type:"POST",
+                        data: { //里面是要发送的数据
+                            api: "plan",
+                            name: $("#name").val(),
+                            house: $("#house").val(),
+                            time: $("#time").val(),
+                            number: $("#number").val(),
+                            price: $("#price").val()
+
+                        },
+                        success: function(data) { //请求成功后执行，data是成功后接收到的数据
+
+                            var obj = JSON.parse(data);
+                            if (obj.status === "false") {
+                                alert(obj.msg);
+                            } else if (obj.status === "true") {
+                                back();
+                            }
+                            console.log("post接收到的数据：" + data);
+                        },
+                        error: function() { //请求失败后执行
+                            console.log("post请求出错");
+                        }
+                    });
+                }
+            });
+
+        });
+    </script>
+</body>
+
+</html>

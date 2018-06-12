@@ -1,0 +1,222 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>登陆</title>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <style>
+        * {
+            margin: 0px;
+        }
+        
+        #bodyer {
+            position: absolute;
+            right: 15%;
+            top: 20%;
+            width: 400px;
+            height: 300px;
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+        
+        #background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0px;
+            right: 0px;
+            background: url(../img/1.jpg) center no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        
+        #bodyer h3 {
+            text-align: center;
+            margin: 13px 0px;
+        }
+        
+        .add_col {
+            width: 400px;
+            height: 50px;
+            box-sizing: border-box;
+            padding: 7px 0px;
+        }
+        
+        .add_col .addp {
+            line-height: 36px;
+            width: 100px;
+            display: inline-block;
+            text-align: center;
+            background-color: #87CEFA;
+            margin-left: 20px;
+        }
+        
+        .add_col input {
+            position: relative;
+            top: -2px;
+            width: 260px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            width: 360px;
+            height: 36px;
+            border: 0px;
+            background-color: #40E0D0;
+            outline: none;
+            margin-left: 20px;
+        }
+        
+        button:active {
+            background-color: #3CB371;
+        }
+        
+        #ls {
+            display: block;
+            color: deepskyblue;
+            float: right;
+            margin: 16px 35px;
+        }
+        
+        #ls:active {
+            color: #8A2BE2;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="background">
+
+        <!--   
+        <div id="login">
+            <h3>登录</h3>
+            <div>账号<input type="text" name="user" id="user" /></div>
+            <div>密码<input type="password" name="pass" id="pass" /></div>
+            <button id="go">登录</button><br>
+            <p id="show" /><br>
+
+        </div>
+    -->
+        <div id="bodyer">
+            <div id="login">
+                <h3>登录</h3>
+                <div class="add_col">
+                    <p class="addp">账号</p><input type="text" name="user" id="user1" /></div>
+                <div class="add_col">
+                    <p class="addp">密码</p><input type="password" name="pass" id="pass1" /></div>
+                <div class="add_col"><button type="button" id="go1">登陆</button></div>
+            </div>
+            <div id="sign" style="display: none">
+                <h3>注册</h3>
+                <div class="add_col">
+                    <p class="addp">账号</p><input type="text" name="user" id="username" autocomplete="off" placeholder="请输入6-12位账号" /></div>
+                <div class="add_col">
+                    <p class="addp">密码</p><input type="password" name="pass" id="password" autocomplete="off" placeholder="请输入6-12位密码" /></div>
+                <div class="add_col">
+                    <p class="addp">验证密码</p><input type="password" name="pass" id="password1" autocomplete="off" placeholder="请再次输入密码" /></div>
+                <div class="add_col"><button type="button" id="go2">注册</button></div>
+            </div>
+            <p id="ls">没有账号？点击注册</p>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            var bool = 1;
+
+            function back() {
+                $("#username").val("");
+                $("#password").val("");
+                $("#password1").val("");
+            }
+
+            function check() {
+                var inpu = $("#sign input");
+                var k = 0;
+                console.log(inpu);
+                for (k; k < inpu.length; k++) {
+                    if (inpu[k].value == null || inpu[k].value == "") {
+                        alert(k, "不允许提交空值");
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            $("#ls").click(function() {
+                if (bool == 1) {
+                    $("#login").css("display", "none");
+                    $("#sign").css("display", "block");
+                    $("#ls").text("已有账号，点击登录");
+                } else if (bool == -1) {
+                    $("#login").css("display", "block");
+                    $("#sign").css("display", "none");
+                    $("#ls").text("没有账号？点击注册");
+                }
+                bool = -bool;
+            });
+            $("#go1").click(function() {
+                $.ajax({
+                    url: "/api/login",
+                    type: "POST",
+                    //type:"POST",
+                    data: {
+                        username: $("#user1").val(),
+                        password: $("#pass1").val()
+                    },
+                    success: function(data) {
+                        var obj = JSON.parse(data);
+                        if (obj.status === "false") {
+                            alert(obj.msg);
+                        } else if (obj.status === "true") {
+                            localStorage.setItem("statu", obj.root);
+                            localStorage.setItem("username", obj.username);
+                            location.href = "main.html";
+                        }
+                        console.log("post接收到的数据：" + data);
+                    },
+                    error: function() {
+                        console.log("post请求出错");
+                    }
+                })
+            });
+
+            $("#go2").click(function() {
+                if (check()) {
+                    if ($("#password").val() == $("#password1").val()) {
+                        $.ajax({
+                            url: "/post/add",
+                            type: "POST",
+                            //type:"POST",
+                            data: {
+                                api: "user",
+                                username: $("#username").val(),
+                                password: $("#password").val(),
+                                rooter: "1",
+                            },
+                            success: function(data) {
+                                back();
+                                var obj = JSON.parse(data);
+                                if (obj.status === "false") {
+                                    alert(data);
+                                } else if (obj.status === "true") {
+                                    alert("注册成功");
+                                }
+
+                            },
+                            error: function() {
+                                console.log("post请求出错");
+                            }
+                        })
+                    } else {
+                        alert("密码验证错误");
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

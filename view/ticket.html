@@ -1,0 +1,274 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>剧目信息</title>
+    <script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <style>
+        * {
+            margin: 0px;
+        }
+        
+        #body {
+            width: 900px;
+            background-color: white;
+            margin: auto;
+            overflow: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        #image {
+            width: 200px;
+            float: left;
+        }
+        
+        #image img {
+            width: 180px;
+        }
+        
+        #videomessage {
+            width: 650px;
+            float: left;
+            font-size: 15px;
+            color: #4F4F4F;
+        }
+        
+        #videomessage h2 {
+            margin: 10px 0px;
+        }
+        
+        #videomessage .content {
+            width: 550px;
+            height: 30px;
+            margin: 5px 0px;
+        }
+        
+        #videomessage p {
+            display: block;
+            height: 30px;
+            line-height: 30px;
+            float: left;
+        }
+        
+        #videomessage .pblock {
+            width: 500px;
+        }
+        
+        #message {
+            width: 880px;
+            overflow: auto;
+        }
+        
+        #brief {
+            width: 100%;
+            background-color: #F0FFFF;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        #brief h4 {
+            margin-bottom: 10px;
+        }
+        
+        #brief p {
+            font-size: 14px;
+            line-height: 30px;
+            color: #696969;
+        }
+        
+        #plan table {
+            width: 100%;
+            background-color: #7FFFD4;
+        }
+        
+        #jie {
+            margin-top: 10px;
+            height: 36px;
+            line-height: 36px;
+            text-align: center;
+            box-sizing: border-box;
+            background-color: #E0FFFF;
+            border: 2px dashed #00FFFF;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="body">
+        <div id="video">
+            <div id="message" v-for="(video,index) in videomessages">
+                <div id="image"><img v-bind:src="'../img/'+video.img" /></div>
+                <div id="videomessage">
+                    <h2>{{video.name}}</h2>
+                    <hr>
+                    <div class="content">
+                        <p>类型： </p>
+                        <p class="pblock">{{video.type}}</p>
+                    </div>
+                    <div class="content">
+                        <p>片长：</p>
+                        <p class="pblock">{{video.time}}分钟</p>
+                    </div>
+                    <div class="content">
+                        <p>导演：</p>
+                        <p class="pblock">{{video.director}}</p>
+                    </div>
+                    <div class="content">
+                        <p>主演：</p>
+                        <p class="pblock">{{video.actor}}</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div id="brief" v-for="(vid,index) in videomessages">
+                <h4>剧情简介</h4>
+                <p>{{vid.brief}}</p>
+            </div>
+        </div>
+        <div id="jie"><pre>场次      1:(8：00-10：30)      2:(11：00-13：30)      3:(14：00-16：30)      4:(17：00-19：30)      5:(20：00-22：30)</pre></div>
+        <div id="plan">
+            <div id="table">
+                <table id="demo" lay-filter="test"></table>
+            </div>
+        </div>
+    </div>
+    <script>
+        var plandata;
+        window.onload = function() {
+            console.log("dddd");
+            $.ajax({
+                url: "/api/get",
+                type: 'POST',
+                data: {
+                    api: "one",
+                    videoname: localStorage.getItem("videoname"),
+                },
+                success: function(data) {
+                    console.log("video", typeof(JSON.parse(data)), JSON.parse(data));
+                    var video = new Vue({
+                        el: '#video',
+                        data: {
+                            videomessages: JSON.parse(data).data,
+                        },
+                        methods: {}
+                    });
+                },
+                error: function() {
+                    console.log("请求出错");
+                }
+
+            });
+
+        }
+    </script>
+    <script src="../layui/layui.all.js"></script>
+
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">选座购票</a>
+    </script>
+    <script>
+        var $ = layui.$;
+        var table = layui.table;
+        var layer = layui.layer;
+        var form = layui.form;
+
+        $.ajax({
+            url: "/get/plan",
+            type: 'POST',
+            data: {
+                api: "plan",
+                videoname: localStorage.getItem("videoname"),
+            },
+            success: function(data) {
+                console.log("plan", typeof(JSON.parse(data)), JSON.parse(data));
+                plandata = JSON.parse(data).data;
+                console.log(plandata);
+                table.render({
+                    elem: '#demo',
+                    cellMinWidth: 100,
+
+                    data: plandata,
+                    id: 'testReload',
+                    cols: [
+                        [ //表头
+                            {
+                                type: 'numbers',
+                                align: 'center',
+                                width: '5%'
+                            }, {
+                                field: 'name',
+                                title: '剧目名',
+                                align: 'center',
+                                width: '22%',
+                                sort: true
+                            }, {
+                                field: 'house',
+                                title: '演出厅',
+                                align: 'center',
+                                width: '12%'
+                            }, {
+                                field: 'time',
+                                title: '日期',
+                                align: 'center',
+                                templet: '#titleTpl',
+                                width: '16%',
+                                sort: true
+                            }, {
+                                field: 'number',
+                                title: '场次',
+                                align: 'center',
+                                width: '12%',
+                                sort: true
+
+                            }, {
+                                field: 'price',
+                                title: '价格',
+                                align: 'center',
+                                width: '15%',
+                                sort: true
+                            }, {
+                                fixed: 'right',
+                                align: 'center',
+                                width: '14%',
+                                toolbar: '#barDemo'
+                            }
+                        ]
+                    ]
+                });
+
+
+            },
+            error: function() {
+                console.log("请求出错");
+            }
+
+        });
+    </script>
+    <script type="text/html" id="titleTpl">
+        {{time(d.time)}}
+    </script>
+    <script>
+        function time(time) {
+            var date = new Date(time);
+            var date_value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+            return date_value;
+        }
+        table.on('tool(test)', function(obj) {
+            var data = obj.data;
+            var layevent = obj.event;
+
+            if (layevent == "del") {
+                localStorage.setItem("planid", data.id);
+                location.href = "buy.html";
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>主界面</title>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+    <style>
+        body {
+            margin: 0px;
+            background-color: blueviolet;
+        }
+        
+        #body {
+            width: 100%;
+            background-color: floralwhite;
+        }
+        
+        #head {
+            width: 100%;
+            height: 68px;
+            background-color: #cdcc96;
+        }
+        
+        #logo img {
+            width: 70px;
+            margin-bottom: -2px;
+            margin-left: 50px;
+        }
+        
+        #leftview {
+            width: 14%;
+            height: calc(100% - 68px);
+            background-color: #ffce7b;
+            float: left;
+            border-right: 2px solid #33a3dc;
+            box-sizing: border-box;
+        }
+        
+        #leftview a {
+            text-decoration: none;
+        }
+        
+        #leftview ul {
+            padding: 0px;
+            height: 280px;
+        }
+        
+        #leftview ul li {
+            list-style-type: none;
+            display: block;
+            box-sizing: border-box;
+            width: 100%;
+            line-height: 40px;
+            padding-left: 40px;
+            border-bottom: 1px solid #00FFFF;
+        }
+        
+        #logo {
+            float: left;
+        }
+        
+        #dl {
+            width: 120px;
+            float: right;
+            height: 68px;
+            margin-right: 40px;
+        }
+        
+        #dl p {
+            width: 120px;
+            line-height: 68px;
+            text-align: center;
+            margin: 0px;
+        }
+        
+        #dl ul {
+            padding: 0px;
+            position: absolute;
+            margin: 0px;
+            width: 120px;
+            background-color: #cdcc96;
+            display: none;
+        }
+        
+        #dl ul li {
+            list-style-type: none;
+            height: 36px;
+            line-height: 36px;
+            text-align: center;
+            border: 1px solid #afb4db;
+        }
+        
+        #leftview img {
+            width: 500px;
+        }
+        
+        #iframebody {
+            width: 86%;
+            height: calc(100% - 68px);
+            float: left;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="body">
+        <div id="head">
+            <div id="logo">
+                <img src="../img/timg.jpg">
+            </div>
+            <div id="dl">
+                <p>的方法</p>
+                <ul>
+                    <li>退出登录</li>
+                </ul>
+            </div>
+        </div>
+        <div id="leftview">
+            <ul id="ul">
+                <a id="yingcheng" href="./yingcheng.html" target="ifra">
+                    <li> 首页</li>
+                </a>
+            </ul>
+            <img src="../img/b1.jpg">
+
+        </div>
+        <div id="iframebody">
+            <iframe src="./yingcheng.html" width="100%" height="100%" frameborder="0" name="ifra"></iframe>
+        </div>
+    </div>
+</body>
+<script>
+    var aa = ' <a href="./videos.html" target="ifra"><li id="videos">剧目表</li></a>'
+    var bb = '<a href="./addvideo.html" target="ifra"><li id="videos">剧目管理</li></a>';
+    var cc = '<a href="./adduser.html" target="ifra"><li id="videos">用户管理</li></a>';
+    var dd = '<a href="./addhouse.html" target="ifra"><li id="videos">演出厅管理</li></a>';
+    var ee = '<a href="./plan.html" target="ifra"><li id="videos">演出计划管理</li></a>';
+    var ff = '<a href="./orders.html" target="ifra"><li id="videos">信息记录</li></a>';
+
+    var height = window.screen.availHeight;
+    $('#body').css('height', height - 100);
+    if (localStorage.getItem("statu") == 1) {
+        $("#ul").append(aa, ff);
+    } else if (localStorage.getItem("statu") == 2) {
+        $("#ul").append(aa, cc, dd);
+    } else if (localStorage.getItem("statu") == 3) {
+        $("#ul").append(aa, bb, ee);
+    } else if (localStorage.getItem("statu") == 4) {
+        $("#ul").append(aa, ff);
+    } else if (localStorage.getItem("statu") == 5) {
+        $("#ul").append(aa, bb, cc, dd, ee, ff);
+    }
+    $("#ul li").click(function() {
+        $("#ul li").css("background-color", "#ffce7b");
+        $(this).css("background", "#7bbfea");
+    });
+    $("#dl").mouseenter(function() {
+        $("#dl ul").css("display", "block");
+    });
+    $("#dl").mouseleave(function() {
+        $("#dl ul").css("display", "none");
+    });
+    $("#dl p").text(localStorage.getItem("username"));
+    $("#dl li").click(function() {
+        location.href = "./login.html";
+        localStorage.clear();
+    });
+</script>
+
+</html>

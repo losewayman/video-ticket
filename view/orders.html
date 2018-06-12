@@ -1,0 +1,286 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>信息统计</title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <style>
+        #find {
+            margin-left: 20px;
+        }
+        
+        .add_col {
+            width: 500px;
+            height: 50px;
+            box-sizing: border-box;
+            padding: 7px 0px;
+        }
+        
+        .add_col p {
+            line-height: 36px;
+            width: 100px;
+            display: inline-block;
+            text-align: center;
+            background-color: #87CEFA;
+        }
+        
+        .add_col input {
+            height: 36px;
+            width: 200px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        
+        .add_col select {
+            height: 36px;
+            width: 200px;
+            padding: 8px;
+            box-sizing: border-box;
+            position: relative;
+            top: 2.5px;
+        }
+        
+        .add_col button {
+            width: 60px;
+            height: 36px;
+            position: relative;
+            top: 1px;
+        }
+        
+        .add_col span {
+            height: 36px;
+            line-height: 36px;
+            margin-left: 30px;
+        }
+        
+        #show {
+            width: 120px;
+            height: 36px;
+            outline: none;
+            border: 0px;
+            background-color: #40E0D0;
+            margin: 10px;
+            box-shadow: 2px 3px 3px #72777b;
+            position: relative;
+        }
+        
+        #show:active {
+            background-color: darkcyan;
+            top: 2px;
+            left: 2px;
+            box-shadow: none;
+        }
+        
+        #find {
+            display: none;
+        }
+    </style>
+</head>
+
+<body><button id="show">信息查询</button>
+    <div id="find">
+        <div class="add_col">
+            <p>电影名</p><select name="name" id="name">
+                    <option value="">请选择</option>
+                    <option v-for="(video,index) in videos" v-bind:value="video.name" >{{video.name}}</option>
+                </select><button type="button" id="find1">查询</button><span id="find11">总钱数：</span></div>
+        <div class="add_col">
+            <p>演出厅</p><select name="house" id="house">
+                    <option value="">请选择</option>
+                    <option v-for="(house,index) in houses" v-bind:value="house.housename">{{house.housename}}</option>
+                </select><button type="button" id="find2">查询</button><span id="find22">总钱数：</span></div>
+        <div class="add_col">
+            <p>用户名</p><input type="text" name="username" id="username" autocomplete="off" placeholder="请输入用户名" /><button type="button" id="find3">查询</button><span id="find33">总钱数：</span></div>
+        <div class="add_col">
+            <p>日期</p><input type="date" name="time" id="time" autocomplete="off" placeholder="请输入日期 xxxx-xx-xx" /><button type="button" id="find4">查询</button><span id="find44">总钱数：</span></div>
+    </div>
+    <div id="table">
+        <table id="demo" lay-filter="test"></table>
+    </div>
+    <script src="../layui/layui.all.js"></script>
+
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+    <script>
+        var $ = layui.$;
+        var table = layui.table;
+        var layer = layui.layer;
+        var laytpl = layui.laytpl;
+        var form = layui.form;
+        var url;
+        if (localStorage.getItem("statu") == 1) {
+            url = "/get/orders?api=" + localStorage.getItem("username") + "&statu=1";
+            $("#show").css("display", "none");
+        } else {
+            url = "/get/orders?api=all&statu=2";
+        }
+        table.render({
+            elem: '#demo',
+
+
+            url: url, //数据接口
+            id: 'testReload',
+            cols: [
+                [ //表头
+                    {
+                        type: 'numbers',
+                        align: 'center',
+                        width: '4%'
+                    }, {
+                        field: 'username',
+                        title: '用户名',
+                        align: 'center',
+                        width: '10%'
+                    }, {
+                        field: 'videoname',
+                        title: '剧目名',
+                        align: 'center',
+                        width: '15%'
+                    }, {
+                        field: 'house',
+                        title: '演出厅',
+                        align: 'center',
+                        width: '10%'
+                    }, {
+                        field: 'time',
+                        title: '日期',
+                        align: 'center',
+                        templet: '#titleTpl',
+                        width: '10%',
+                        sort: true
+                    }, {
+                        field: 'number',
+                        title: '场次',
+                        align: 'center',
+                        width: '7%'
+
+                    }, {
+                        field: 'seat',
+                        title: '购买座位',
+                        align: 'center',
+                        width: '16%'
+                    }, {
+                        field: 'ticket',
+                        title: '票数',
+                        align: 'center',
+                        width: '8%'
+                    }, {
+                        field: 'price',
+                        title: '价格',
+                        align: 'center',
+                        width: '8%'
+                    }, {
+                        field: 'money',
+                        title: '总钱数',
+                        align: 'center',
+                        width: '10%',
+                        sort: true
+                    },
+                ]
+            ]
+        });
+    </script>
+    <script type="text/html" id="titleTpl">
+        {{time(d.time)}}
+    </script>
+    <script>
+        $("#show").click(function() {
+            $("#find").slideToggle("slow");
+        });
+
+        function time(time) {
+            var date = new Date(time);
+            var date_value = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+            return date_value;
+        }
+
+        function ajaxs(datas, thiss) {
+            $.ajax({
+                url: '/find/orders',
+                type: 'POST',
+                data: datas,
+                success: function(data) {
+                    var obj = JSON.parse(data);
+                    thiss.text("总钱数：" + obj.data[0].num);
+                    console.log(obj);
+                },
+                error: function() {
+                    alert("error");
+                }
+            });
+        }
+        $.ajax({
+            url: "/get/message?api=house",
+            type: "GET",
+            data: {},
+            success: function(data) {
+                var obj = JSON.parse(data);
+                console.log(data);
+                console.log(obj.data);
+                var video = new Vue({
+                    el: '#house',
+                    data: {
+                        houses: obj.data,
+                    }
+                })
+            },
+            error: function() {
+                console.log("请求出错");
+            }
+        });
+        $.ajax({
+            url: "/get/message?api=video",
+            type: "GET",
+            data: {},
+            success: function(data) {
+                var obj = JSON.parse(data);
+                console.log(obj);
+                console.log(data);
+                var video = new Vue({
+                    el: '#name',
+                    data: {
+                        videos: obj.data,
+                    }
+                });
+            },
+            error: function() {
+                console.log("请求出错");
+            }
+        });
+        $("#find1").click(function() {
+            var da = {
+                api: 'videoname',
+                videoname: $("#name").val(),
+            }
+            ajaxs(da, $("#find11"));
+
+        });
+        $("#find2").click(function() {
+            var da = {
+                api: 'house',
+                house: $("#house").val(),
+            }
+            ajaxs(da, $("#find22"));
+        });
+        $("#find3").click(function() {
+            var da = {
+                api: 'username',
+                username: $("#username").val(),
+            }
+            ajaxs(da, $("#find33"));
+        });
+        $("#find4").click(function() {
+            var da = {
+                api: 'time',
+                time: $("#time").val(),
+            }
+            ajaxs(da, $("#find44"));
+        });
+    </script>
+</body>
+
+</html>

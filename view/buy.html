@@ -1,0 +1,304 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>购票</title>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <style>
+        * {
+            margin: 0px;
+        }
+        
+        #body {
+            width: 1000px;
+            overflow: auto;
+            margin: 10px auto;
+        }
+        
+        #left {
+            width: 600px;
+            background-color: white;
+            float: left;
+            height: 600px;
+            border: 1px dashed #faa755;
+            border-right: none;
+        }
+        
+        #right {
+            width: 300px;
+            height: 600px;
+            background-color: #E0FFFF;
+            float: left;
+            border: 1px dashed #6950a1;
+        }
+        
+        #note {
+            width: 500px;
+            padding: 15px;
+            height: 60px;
+            box-sizing: border-box;
+            margin: auto;
+        }
+        
+        #note p {
+            display: block;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            float: left;
+            margin: 0px 30px;
+        }
+        
+        #note img {
+            width: 30px;
+            position: relative;
+            top: 7px;
+        }
+        
+        #checkseat {
+            width: 100%;
+            height: 500px;
+        }
+        
+        #seat {
+            width: 400px;
+            height: 400px;
+            margin: auto;
+        }
+        
+        #img {
+            width: 500px;
+            margin: auto;
+        }
+        
+        #img img {
+            width: 100%;
+        }
+        
+        .number,
+        .canuse {
+            float: left;
+            width: 40px;
+            height: 40px;
+            box-sizing: border-box;
+            padding: 8px;
+        }
+        
+        .canuse img {
+            width: 24px;
+        }
+        
+        #videoticket {
+            width: 260px;
+            overflow: auto;
+            margin: auto;
+            margin-top: 20px;
+        }
+        
+        #videoticket div {
+            width: 100%;
+            overflow: auto;
+            margin: 5px 0px;
+        }
+        
+        #videoticket p {
+            display: block;
+            overflow: auto;
+            line-height: 30px;
+            float: left;
+            color: #426ab3;
+        }
+        
+        #videoticket .ticket {
+            font-size: 13px;
+            color: #33a3dc;
+        }
+        
+        #ticketseat {
+            width: 220px;
+        }
+        
+        #ticketpage {
+            background-color: #585eaa;
+            padding: 8px 20px;
+            color: white;
+            box-sizing: border-box;
+        }
+        
+        #buy {
+            width: 220px;
+            height: 30px;
+            color: white;
+            background-color: #6495ED;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 5px;
+            margin: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="body">
+        <div id="left">
+            <div id="note">
+                <p><img src="../img/zw_kx.gif"> 可选座位 </p>
+                <p><img src="../img/zw_yx.gif">待购座位</p>
+                <p><img src="../img/yx.gif">已售座位</p>
+            </div>
+            <div id="checkseat">
+                <div id="img"><img src="../img/ping.png"></div>
+                <div id="seat">
+                    <div class="number"></div>
+                </div>
+            </div>
+
+        </div>
+        <div id="right">
+            <div id="videoticket">
+                <div id="ticketpage">电影票</div>
+                <div>
+                    <p id="ticketname"></p>
+                </div>
+                <div>
+                    <p class="ticket">演出厅：</p>
+                    <p id="tickethouse"></p>
+                </div>
+                <div>
+                    <p class="ticket">时间：</p>
+                    <p id="tickettime"></p>
+                </div>
+                <div>
+                    <p class="ticket">场次：</p>
+                    <p id="ticketnumber"></p>
+                </div>
+                <div>
+                    <p class="ticket">价格：</p>
+                    <p id="ticketprice"></p>
+                </div>
+                <div>
+                    <p class="ticket">座位：</p>
+                    <p id="ticketseat"></p>
+                </div>
+                <hr>
+                <div>
+                    <p class="ticket">总计：</p>
+                    <p id="ticketall"></p>
+                </div>
+
+            </div>
+            <div id="buy">确认购买</div>
+        </div>
+    </div>
+
+
+    <script>
+        var da = {};
+        var i = 0;
+        var arry = [];
+        var time;
+        var seatnum = [];
+        $.ajax({
+            url: "/get/plan",
+            type: "POST",
+            data: {
+                api: "buy",
+                id: localStorage.getItem("planid"),
+            },
+            success: function(data) {
+                da = JSON.parse(data).data[0];
+
+                console.log(da);
+                var date = new Date(da.time);
+                time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+                var seat = JSON.parse(da.seat);
+                arry = seat;
+                $("#ticketname").text(da.name);
+                $("#tickettime").text(time);
+                $("#tickethouse").text(da.house);
+                $("#ticketnumber").text(da.number);
+                $("#ticketprice").text(da.price);
+                for (; i < 100; i++) {
+                    var temp = $(".number:first").clone();
+                    if (seat[i] == "1") {
+                        temp.html("<img src='../img/zw_kx.gif'>");
+                        temp.attr("class", "canuse");
+                    } else if (seat[i] == "2") {
+                        temp.html("<img src='../img/yx.gif'>");
+                    }
+                    temp.attr("num", i);
+                    $("#seat").append(temp);
+
+                }
+                $(".number:first").css("display", "none");
+                $(".canuse").click(function() {
+                    if (arry[$(this).attr("num")] === 1) {
+                        arry[$(this).attr("num")]++;
+                        $(this).children("img").attr("src", "../img/zw_yx.gif");
+                        seatnum.push(parseInt($(this).attr("num")) + 1);
+                    } else if (arry[$(this).attr("num")] === 2) {
+                        arry[$(this).attr("num")]--;
+                        $(this).children("img").attr("src", "../img/zw_kx.gif");
+                        seatnum.splice(seatnum.indexOf(parseInt($(this).attr("num")) + 1), 1);
+                    }
+                    $("#ticketall").text(da.price * seatnum.length + "元");
+                    $("#ticketseat").text(seatnum.map(function(se) {
+                        se = parseInt(se);
+                        if (se % 10 == 0) {
+                            x = parseInt(se / 10) - 1;
+                            y = 10;
+                        } else {
+                            var x = parseInt(se / 10);
+                            y = se - x * 10;
+                            console.log(se, x, y);
+                        }
+                        console.log(se, x, y);
+                        return x + 1 + "排" + y + "列";
+                    }));
+                    console.log(seatnum);
+                    console.log(JSON.stringify(arry));
+                });
+
+
+            },
+            error: function() {
+                console.log("请求出错");
+            }
+        });
+        $("#buy").click(function() {
+            console.log(JSON.stringify(seatnum));
+            $.ajax({
+                url: "/update/plan",
+                type: "POST",
+                data: {
+                    id: da.id,
+                    planseat: JSON.stringify(arry),
+                    username: localStorage.getItem("username"),
+                    videoname: da.name,
+                    house: da.house,
+                    time: time,
+                    number: da.number,
+                    orderseat: JSON.stringify(seatnum),
+                    ticket: seatnum.length,
+                    price: da.price,
+                    money: da.price * seatnum.length
+                },
+                success: function(data) {
+                    var obj = JSON.parse(data);
+                    if (obj.status === "false") {
+                        alert(obj.msg);
+                    } else if (obj.status === "true") {
+                        alert(obj.msg);
+                        location.href = "./videos.html";
+                    }
+                },
+                error: function() {
+                    console.log("post请求出错");
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

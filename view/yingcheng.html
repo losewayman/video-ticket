@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>电影选票</title>
+    <script src="https://cdn.bootcss.com/vue/2.2.2/vue.min.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="../jscss/yingcheng.css" type="text/css">
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <!--<div id="head">
+        <div id="head_content">
+            <div id="logo">
+                <a href="#"><img src="./img/timg.jpg"></a>
+            </div>
+            <ul id="ul_right">
+                <li class="ul_right_li" v-for="item in right_items" v-bind:class="item.class"><a v-bind:href="item.href">{{item.message}}</a></li>
+            </ul>
+        </div>
+
+    </div>-->
+    <div id="lun_body">
+        <div v-bind:style="{width:width+'%'}" id="content_lunbo" v-on:mouseenter="enter()" v-on:mouseleave="leave()">
+            <div v-for="(lunbo,index) in lunbos" v-bind:style="{width:widths+'%','transition':'margin-left 2500ms ease'}" v-bind:class="[lunbo.class1,lunbo.class2]">
+                <div id="content_in" v-html="lunbo.html"></div>
+            </div>
+        </div>
+        <div id="lunicont">
+            <ul v-bind:style="{width:icont+'px'}">
+                <li v-for="(lunbo,index) in lunbos" v-on:click="icontedit(index)">
+                    <a></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="content-1">
+        <p class="content-1-p">{{titlep}}</p>
+        <div id="content-1-1">
+            <component-one v-for="(bodyone,index) in bodyones" v-bind:bodyer="bodyone" v-bind:key="bodyone.id"></component-one>
+        </div>
+    </div>
+
+
+    <div id="content-3">
+        <div id="content-3-body">
+            <div id="content-3-h"><span>{{content3h}}</span></div>
+            <div id="content-3-edit">
+                <ul>
+                    <li class="content-3-li" v-for="(content3li,index) in content3lis"><a v-bind:href="content3li.href">{{content3li.content}}</a></li>
+                </ul>
+            </div>
+            <div id="content-3-card">
+                <component-three v-for="(content3card,index) in content3cards" v-bind:bodyer="content3card" v-bind:key="content3card.id"></component-three>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <script src="../jscss/yingcheng.js" type="text/javascript"></script>
+    <script>
+    </script>
+
+</body>
+
+</html>
