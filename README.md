@@ -15,6 +15,7 @@
 >例：一个剧目的列表，点击进入之后每个页面的结构都是相同的
 * 对其具体实现不是很清楚，猜想此功能由后台模板渲染完成
 ## 数据库的使用情况(mysql)
+> 数据库信息保存在node_modules/sqlpool.js文件内，user为数据库用户名，password为数据库密码，database为数据库名。
 > 共有5张表
 * login（用户表） | id | username | password | rooter |
 * video（剧目表）| id | name | type | time | actor | director | brief | img |
